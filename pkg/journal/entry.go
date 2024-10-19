@@ -27,7 +27,16 @@ func NewEntry(title, content string) Entry {
 
 // UpdateEntry allows you to update the content and title of an existing entry.
 func (entry *Entry) UpdateEntry(title, content string) {
-	entry.Title = title
-	entry.Content = content
-	entry.Updated = time.Now()
+	isUpdated := false
+	if len(title) > 0 {
+		entry.Title = title
+		isUpdated = true
+	}
+	if len(content) > 0 {
+		entry.Content = content
+		isUpdated = true
+	}
+	if isUpdated == true {
+		entry.Updated = time.Now()
+	}
 }

@@ -45,14 +45,15 @@ func main() {
 			fmt.Printf(" ID: %s\n Title: %s\n Content: %s\n Created: %s\n\n", entry.ID, entry.Title, entry.Content, entry.Created)
 
 		}
+	case "":
 	case "interactive":
 		// Create a scanner to read input from the terminal
 		scanner := bufio.NewScanner(os.Stdin)
 		var title, content string
 		fmt.Println("You are in the Journal program in interactive mode")
-		fmt.Println("usage: create | list")
-		fmt.Println("Type 'exit' to quit.")
 		for {
+			fmt.Println("usage: create | list")
+			fmt.Println("Type 'exit' to quit.")
 			// Prompt the user for input
 			fmt.Print("> ")
 
@@ -70,10 +71,10 @@ func main() {
 				// handle other commands here
 				switch input {
 				case "create":
-					fmt.Println("Enter journal title")
+					fmt.Println("Enter entry title")
 					scanner.Scan()
-					fmt.Println("Enter journal content")
 					title = scanner.Text()
+					fmt.Println("Enter entry content")
 					scanner.Scan()
 					content = scanner.Text()
 					entry := journalInstance.CreateEntry(title, content)
@@ -88,9 +89,56 @@ func main() {
 					for _, entry := range entries {
 						fmt.Printf(" ID: %s\n Title: %s\n Content: %s\n Created: %s\n\n", entry.ID, entry.Title, entry.Content, entry.Created)
 					}
+
+				case "get":
+					fmt.Println("Enter entry ID")
+					scanner.Scan()
+					entryId := scanner.Text()
+					entry, err := journalInstance.GetEntry(strings.TrimSpace(entryId))
+					if err != nil {
+						fmt.Println(err)
+						continue
+					}
+					fmt.Printf("ID: %s\n Title: %s\n Content: %s\n Created: %s\n Updated: %s\n\n", entry.ID, entry.Title, entry.Content, entry.Created, entry.Updated)
+
+				case "delete":
+					fmt.Println("Enter entry ID")
+					scanner.Scan()
+					entryId := scanner.Text()
+					err := journalInstance.DeleteEntry(strings.TrimSpace(entryId))
+					if err != nil {
+						fmt.Println(err)
+					}
+
+				case "update":
+					fmt.Println("Enter entry ID")
+					scanner.Scan()
+					entryId := scanner.Text()
+
+					updatedEntry := map[string]string{
+						"title":   "",
+						"content": "",
+					}
+					for k, _ := range updatedEntry {
+						fmt.Printf("Do you want to update the %v? Y/N\n", k)
+						scanner.Scan()
+						isUpdateField := strings.ToUpper(strings.TrimSpace(scanner.Text())) == "Y"
+						if isUpdateField {
+							fmt.Printf("Enter new %s\n", k)
+							scanner.Scan()
+							updatedEntry[k] = scanner.Text()
+						}
+					}
+					entry, err := journalInstance.UpdateEntry(entryId, updatedEntry["title"], updatedEntry["content"])
+					if err != nil {
+						fmt.Println(err)
+						continue
+					}
+					fmt.Printf("ID: %s\n Title: %s\n Content: %s\n Created: %s\n Updated: %s\n\n", entry.ID, entry.Title, entry.Content, entry.Created, entry.Updated)
+
 				default:
 					fmt.Println("Unknown command: " + input)
-					fmt.Println("Available commands: create, list")
+					fmt.Println("Available commands: create, list", "get", "delete", "update")
 
 				}
 			}
