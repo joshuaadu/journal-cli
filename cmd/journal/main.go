@@ -4,13 +4,28 @@ import (
 	"bufio"
 	"fmt"
 	"journal/pkg/journal"
+	"journal/pkg/storage"
 	"os"
 	"strings"
 )
 
 func main() {
 	// Create a new journal instance
-	journalInstance := journal.NewJournal()
+	//journalInstance := journal.NewJournal()
+
+	// SQLite file for storing journal entries
+	dbFileName := "journal.db"
+
+	// Initialize SQLite storage
+	sqliteStorage, err := storage.NewSQLiteStorage(dbFileName)
+
+	if err != nil {
+		fmt.Println("Error initializing SQLite: ", err)
+		return
+	}
+
+	// Create a new journal instance using SQLite
+	journalInstance := journal.NewJournal(sqliteStorage)
 
 	// Check command line arguments
 	if len(os.Args) < 2 {
@@ -52,7 +67,7 @@ func main() {
 		var title, content string
 		fmt.Println("You are in the Journal program in interactive mode")
 		for {
-			fmt.Println("usage: create | list")
+			fmt.Println("usage: create | list | get | update | delete")
 			fmt.Println("Type 'exit' to quit.")
 			// Prompt the user for input
 			fmt.Print("> ")
