@@ -9,7 +9,7 @@ This project has been designed to be extensible, with a modular architecture tha
 This application was created to deepen my understanding of network server programming in Go, RESTful API development, and database management with SQLite. 
 It demonstrates foundational concepts in backend networking, with potential for scaling to more complex systems like fully fledged web application .
 
-[Software Demo Video](https://youtu.be/K_7iwzL7ORE)
+[Software Demo Video](https://youtu.be/oWIZb3T01Hk)
 
 # Network Communication
 The architecture used in this project is Client-Server. 
@@ -24,6 +24,25 @@ The journaling server runs as a standalone HTTP server that can be accessed via 
   - Get a Single Entry: **GET /entries/{id}** - Retrieves a specific entry by its unique id.
   - Update an Entry: **PUT /entries/{id}** - Updates the title and/or content of a specific entry.
   - Delete an Entry: **DELETE /entries/{id}** - Removes a specific entry by its id.
+
+## Example requests
+```shell
+curl http://localhost:8080/entries
+```
+```shell
+curl -X POST -d '{"title":"My Fi
+rst Entry","content":"This is my entry"}' \     
+-H "Content-Type: application/json" http://localhost:8080/entries
+```
+```shell
+curl -X DELETE http://localhost:8080/entries/entryID
+```
+```shell
+ curl -X PUT  -d '{"title":"second updated title", "content":"second Updated content"}' -H  "Content-Type: application/json" http://localhost:8080/entries/entryID
+```
+```shell
+curl http://localhost:8080/entries/entryID
+```
 
 
 # Relational Database
