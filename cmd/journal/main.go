@@ -46,12 +46,20 @@ func main() {
 		title := os.Args[2]
 		content := os.Args[3]
 
-		entry := journalInstance.CreateEntry(title, content)
+		entry, err := journalInstance.CreateEntry(title, content)
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
 		fmt.Println("Created entry: %s\n", entry.ID)
 
 	case "list":
 		// List all journal entries
-		entries := journalInstance.ListEntries()
+		entries, err := journalInstance.ListEntries()
+		if err != nil {
+			fmt.Println(err)
+			break
+		}
 		if len(entries) < 1 {
 			fmt.Println("No entries found.")
 			return
@@ -92,14 +100,23 @@ func main() {
 					fmt.Println("Enter entry content")
 					scanner.Scan()
 					content = scanner.Text()
-					entry := journalInstance.CreateEntry(title, content)
+					entry, err := journalInstance.CreateEntry(title, content)
+					if err != nil {
+						fmt.Println(err)
+						continue
+					}
 
 					fmt.Println("Created entry: %s\n", entry.ID)
 
 				case "list":
-					entries := journalInstance.ListEntries()
+					entries, err := journalInstance.ListEntries()
 					if len(entries) < 1 {
 						fmt.Println("No entries found.")
+					}
+
+					if err != nil {
+						fmt.Println(err)
+						continue
 					}
 					for _, entry := range entries {
 						fmt.Printf(" ID: %s\n Title: %s\n Content: %s\n Created: %s\n\n", entry.ID, entry.Title, entry.Content, entry.Created)

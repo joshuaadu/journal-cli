@@ -21,21 +21,27 @@ func NewJournal(store storage.Storage) *Journal {
 }
 
 // CreateEntry creates a new journal entry and adds it to the journal.
-func (journal *Journal) CreateEntry(title, content string) models.Entry {
+func (journal *Journal) CreateEntry(title, content string) (models.Entry, error) {
 	entry := NewEntry(title, content)
 	//journal.entries[entry.ID] = entry
-	journal.storage.CreateEntry(entry)
-	return entry
+	if err := journal.storage.CreateEntry(entry); err != nil {
+		return models.Entry{}, err
+	}
+
+	return entry, nil
 }
 
 // ListEntries returns all the entries in the journal
-func (journal *Journal) ListEntries() []models.Entry {
+func (journal *Journal) ListEntries() ([]models.Entry, error) {
 	//var entries []Entry
 	//for _, entry := range journal.entries {
 	//	entries = append(entries, entry)
 	//}
-	entries, _ := journal.storage.LoadEntries()
-	return entries
+	entries, err := journal.storage.LoadEntries()
+	if err != nil {
+		return []models.Entry{}, err
+	}
+	return entries, nil
 }
 
 // UpdateEntry updates the title and content of an existing entry
