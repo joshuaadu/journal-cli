@@ -1,7 +1,8 @@
 # Overview
-This project is a journaling application designed to provide a seamless user experience through both command-line and web-based interfaces. 
+This project is a journaling application designed to provide a seamless user experience through both command-line and web-based interfaces including a RESTful API and a frontend interface. 
 Users can create, retrieve, update, and delete journal entries, all stored in a persistent SQLite database. 
 The web server exposes a RESTful API to facilitate interaction with the journal entries and serves as a way to explore HTTP-based CRUD operations in a real-world scenario.
+The frontend application provides a clean and interactive interface for uses to easily view and add journal entries
 The journaling application allows users to create and list journal entries with the capacity to extend to list, update, and delete and view journal entries. 
 The entries are saved in a local SQLite database, ensuring data persistence across program executions. 
 This project has been designed to be extensible, with a modular architecture that separates the concerns of command-line interaction and data storage.
@@ -9,7 +10,7 @@ This project has been designed to be extensible, with a modular architecture tha
 This application was created to deepen my understanding of network server programming in Go, RESTful API development, and database management with SQLite. 
 It demonstrates foundational concepts in backend networking, with potential for scaling to more complex systems like fully fledged web application .
 
-[Software Demo Video](https://youtu.be/oWIZb3T01Hk)
+[Software Demo Video](https://youtu.be/bg_XjtBb1o4)
 
 # Network Communication
 The architecture used in this project is Client-Server. 
@@ -24,6 +25,13 @@ The journaling server runs as a standalone HTTP server that can be accessed via 
   - Get a Single Entry: **GET /entries/{id}** - Retrieves a specific entry by its unique id.
   - Update an Entry: **PUT /entries/{id}** - Updates the title and/or content of a specific entry.
   - Delete an Entry: **DELETE /entries/{id}** - Removes a specific entry by its id.
+
+## Web Pages
+1. **Home Page**: Displays a list of all journal entries. Each entry can be clicked to view more details or updated. New entries can also be created from this page.
+2. **Add New Entry Page**: A form where users can enter the title and content for a new journal entry. After submission, the new entry is added to the database and the user is redirected to the home page.
+3. **View Entry Page**: Shows the details of a single journal entry. 
+
+[//]: # (4. From this page, users can edit the entry or delete it.)
 
 ## Example requests
 ```shell
@@ -73,9 +81,9 @@ Whenever the application starts, it checks if the journal_entries table exists a
 - SQLite driver for Go ((https://github.com/mattn/go-sqlite3)
 - Gorilla Mux a powerful HTTP router and URL matcher for building Go web servers (https://github.com/gorilla/mux)
 - Custom packages for modular functionality (journal, storage, utils)
+- Go templates (https://pkg.go.dev/text/template@go1.23.3, https://pkg.go.dev/html/template@go1.23.3)
 
 # Useful Websites
-
 - [Go Documentation](https://golang.org/doc/)
 - [A Tour of Go](https://go.dev/tour/list)
 - [Go Modules](https://blog.golang.org/using-go-modules)
@@ -87,9 +95,11 @@ Whenever the application starts, it checks if the journal_entries table exists a
 - [Using SQLite from Go](https://practicalgobook.net/posts/go-sqlite-no-cgo/)
 - [Golang SQLite `database/sql`](https://earthly.dev/blog/golang-sqlite/)
 - [Gorilla Mux](https://github.com/gorilla/mux)
+- [TailwindCSS Documentation](https://tailwindcss.com/docs)
 
 # Future Work
-
-- Add search functionality
-- Add user authentication 
-- Implement web front end interface
+- Implement user authentication and authorization for secure access.
+- Add more sophisticated error handling and user feedback messages.
+- Migrate to using PostgreSQL for a more scalable and robust database solution.
+- Enhance the styling and layout with more complex TailwindCSS components.
+- Explore additional features like filtering, search functionality, and pagination for the entry list.
