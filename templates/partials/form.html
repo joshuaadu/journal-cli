@@ -1,0 +1,43 @@
+{{ define "form" }}
+<!--
+  Heads up! 👋
+
+  Plugins:
+    - @tailwindcss/forms
+-->
+
+
+
+                <form action="/app/entries/new" method="POST" class="bg-white mb-0 mt-6 space-y-4 rounded-lg p-4 shadow-lg sm:p-6 lg:p-8">
+                    <div>
+                        <label class="sr-only" for="title">Title</label>
+                        <input
+                                class="w-full rounded-lg border-gray-200 p-3 text-sm"
+                                placeholder="Title"
+                                type="text"
+                                id="title"
+                                name="title"
+                        />
+                    </div>
+
+                    <div>
+                        <label class="sr-only" for="content">Content</label>
+                        <textarea
+                                class="w-full rounded-lg border-gray-200 p-3 text-sm"
+                                placeholder="Content"
+                                rows="8"
+                                id="context"
+                                name="content"
+                        ></textarea>
+                    </div>
+
+                    <div class="mt-4">
+                        <button
+                                type="submit"
+                                class="inline-block w-full rounded-lg bg-black px-5 py-3 font-medium text-white sm:w-auto"
+                        >
+                            Submit
+                        </button>
+                    </div>
+                </form>
+{{ end }}

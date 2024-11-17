@@ -1,0 +1,25 @@
+{{ define "content" }}
+{{ block "header" . }} {{ end }}
+<div class="mx-auto max-w-screen-xl px-4 py-16 sm:px-6 lg:px-8">
+    <article class="group">
+        <img
+                alt=""
+                src="https://images.unsplash.com/photo-1661956602116-aa6865609028?ixlib=rb-4.0.3&ixid=M3wxMjA3fDF8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=764&q=80"
+                class="h-56 w-full rounded-xl object-cover shadow-xl transition group-hover:grayscale-[50%]"
+        />
+
+        <div class="p-4">
+            <a href="#">
+                <h3 class="text-lg font-medium text-gray-900">{{ .Entry.Title }}</h3>
+            </a>
+
+            <p class="mt-2 line-clamp-3 text-sm/relaxed text-gray-500">
+                {{ .Entry.Content }}
+            </p>
+            <time datetime="2022-10-10" class="block text-xs text-gray-500 py-2"> {{ .Entry.Created | formatTime }} </time>
+
+        </div>
+    </article>
+</div>
+
+{{ end }}

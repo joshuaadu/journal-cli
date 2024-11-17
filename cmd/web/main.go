@@ -4,8 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/gorilla/mux"
+	"html/template"
+	"journal/models"
 	"journal/pkg/journal"
 	"journal/pkg/storage"
+	"journal/pkg/utils"
 	"log"
 	"net/http"
 )
@@ -14,7 +17,20 @@ type EntryInput struct {
 	Title, Content string
 }
 
+type PageData struct {
+	Title         string
+	Entries       []models.Entry
+	Entry         models.Entry
+	ShowCreateBtn bool
+	Error         string
+}
+
 var journalIntance *journal.Journal
+
+// Create a FuncMap with the custom time formatting function
+var funcMap = template.FuncMap{
+	"formatTime": utils.FormatTime,
+}
 
 func main() {
 	//Initialize storage
@@ -29,17 +45,124 @@ func main() {
 	router := mux.NewRouter()
 
 	// Define routes
-	router.HandleFunc("/entries", ListEntries).Methods("GET")         // List all entries
-	router.HandleFunc("/entries", CreateEntry).Methods("POST")        // Create a new entry
-	router.HandleFunc("/entries/{id}", GetEntry).Methods("GET")       // Get a specified entry by ID
-	router.HandleFunc("/entries/{id}", UpdateEntry).Methods("PUT")    //  // Update an entry by ID
-	router.HandleFunc("/entries/{id}", DeleteEntry).Methods("DELETE") // Delete an entry by ID
+	router.HandleFunc("/test", TestHandler).Methods("GET")
+	router.HandleFunc("/app", EntriesHandler).Methods("GET")
+	router.HandleFunc("/app/entries/new", NewEntryPageHandler).Methods("GET")
+	router.HandleFunc("/app/entries/new", PostNewEntryHandler).Methods("POST")
+	router.HandleFunc("/app/entries/{id}", ViewEntryHandler).Methods("GET") // Get a specified entry by ID
+	router.HandleFunc("/api/entries", ListEntries).Methods("GET")           // List all entries
+	router.HandleFunc("/api/entries", CreateEntry).Methods("POST")          // Create a new entry
+	router.HandleFunc("/api/entries/{id}", GetEntry).Methods("GET")         // Get a specified entry by ID
+	router.HandleFunc("/api/entries/{id}", UpdateEntry).Methods("PUT")      //  // Update an entry by ID
+	router.HandleFunc("/api/entries/{id}", DeleteEntry).Methods("DELETE")   // Delete an entry by ID
 
 	// Start HTTP server
 	port := ":8080"
 	fmt.Println("Starting server on", port)
 	log.Fatal(http.ListenAndServe(port, router))
 
+}
+
+func TestHandler(w http.ResponseWriter, r *http.Request) {
+
+	templates := template.Must(template.ParseFiles("templates/pages/heloworld.html"))
+	data := "Test"
+	templates.Execute(w, data)
+}
+
+func ViewEntryHandler(w http.ResponseWriter, r *http.Request) {
+	templates := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/layouts/base.html",
+		"templates/pages/entry.html", "templates/partials/header.html"))
+	data := PageData{
+		Title:         "View Entry",
+		ShowCreateBtn: true,
+		//Error: "Method not allowed",
+	}
+
+	id := mux.Vars(r)["id"]
+	entry, err := journalIntance.GetEntry(id)
+	if err != nil {
+		http.Redirect(w, r, "/app", http.StatusSeeOther)
+	}
+	data.Entry = entry
+
+	err = templates.ExecuteTemplate(w, "base", data)
+
+}
+
+func PostNewEntryHandler(w http.ResponseWriter, r *http.Request) {
+	templates := template.Must(template.ParseFiles("templates/layouts/base.html",
+		"templates/pages/new.html", "templates/partials/form.html", "templates/partials/header.html"))
+
+	data := PageData{
+		Title:         "Add New Entry",
+		ShowCreateBtn: false,
+		//Error: "Method not allowed",
+	}
+	if r.Method != http.MethodPost {
+		data.Error = "Method not allowed"
+		templates.ExecuteTemplate(w, "base", data)
+
+		return
+	}
+	if err := r.ParseForm(); err != nil {
+		data.Error = "Invalid input"
+		fmt.Println(err)
+		err = templates.ExecuteTemplate(w, "base", data)
+		//log.Fatal("Create entry failed...:", err)
+		return
+	}
+
+	title := r.FormValue("title")
+	content := r.FormValue("content")
+
+	if len(title) < 1 {
+		data.Error = "Title is required!"
+		err := templates.ExecuteTemplate(w, "base", data)
+		fmt.Println(err)
+		return
+	}
+	if len(content) < 1 {
+		data.Error = "Content is required!"
+		err := templates.ExecuteTemplate(w, "base", data)
+		fmt.Println(err)
+		return
+	}
+
+	_, err := journalIntance.CreateEntry(title, content)
+	if err != nil {
+		http.Error(w, "Failed to create entry", http.StatusInternalServerError)
+	}
+	http.Redirect(w, r, "/app", http.StatusSeeOther)
+}
+
+func NewEntryPageHandler(w http.ResponseWriter, r *http.Request) {
+	templates := template.Must(template.ParseFiles("templates/layouts/base.html",
+		"templates/pages/new.html", "templates/partials/form.html", "templates/partials/header.html"))
+
+	data := PageData{
+		Title:         "Add New Entry",
+		ShowCreateBtn: false,
+	}
+	templates.ExecuteTemplate(w, "base", data)
+}
+
+func EntriesHandler(w http.ResponseWriter, r *http.Request) {
+
+	templates := template.Must(template.New("").Funcs(funcMap).ParseFiles("templates/layouts/base.html",
+		"templates/pages/entries.html", "templates/partials/header.html"))
+
+	entries, _ := journalIntance.ListEntries()
+	data := PageData{
+		Title:         "Journal Entries",
+		Entries:       entries,
+		ShowCreateBtn: true,
+	}
+	fmt.Printf("Home handler %+v\n", data)
+	err := templates.ExecuteTemplate(w, "base", data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 // GetEntry fetches a specific entry by ID
