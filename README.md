@@ -1,6 +1,6 @@
 # Overview
 This project is a journaling application designed to provide a seamless user experience through both command-line and web-based interfaces including a RESTful API and a frontend interface. 
-Users can create, retrieve, update, and delete journal entries, all stored in a persistent SQLite database. 
+Users can create, retrieve, update, and delete journal entries, all stored in a persistent SQLite database or a MongoBD database (database options can easily be switched between SQLite and MongoDB). 
 The web server exposes a RESTful API to facilitate interaction with the journal entries and serves as a way to explore HTTP-based CRUD operations in a real-world scenario.
 The frontend application provides a clean and interactive interface for uses to easily view and add journal entries
 The journaling application allows users to create and list journal entries with the capacity to extend to list, update, and delete and view journal entries. 
@@ -11,6 +11,7 @@ This application was created to deepen my understanding of network server progra
 It demonstrates foundational concepts in backend networking, with potential for scaling to more complex systems like fully fledged web application .
 
 [Software Demo Video](https://youtu.be/bg_XjtBb1o4)
+[Software Demo Video(MongoDB)](https://youtu.be/b0RRqdfYzDw)
 
 # Network Communication
 The architecture used in this project is Client-Server. 
@@ -31,6 +32,18 @@ The journaling server runs as a standalone HTTP server that can be accessed via 
 2. **Add New Entry Page**: A form where users can enter the title and content for a new journal entry. After submission, the new entry is added to the database and the user is redirected to the home page.
 3. **View Entry Page**: Shows the details of a single journal entry. 
 
+## Cloud Database
+The application utilizes MongoDB Atlas, a cloud-based NoSQL database service, to store journal entries. Each entry is stored in the journal database as a document in the entries collection, with the following structure
+```json
+{
+  "id": "unique_entry_id",
+  "title": "Entry Title",
+  "content": "Entry content goes here...",
+  "created": "2024-12-09T20:32:59Z",
+  "updated": "2024-12-09T20:32:59Z"
+}
+
+```
 [//]: # (4. From this page, users can edit the entry or delete it.)
 
 ## Example requests
@@ -57,7 +70,8 @@ curl http://localhost:8080/entries/entryID
 For this project, I used SQLite, a lightweight SQL relational database that is ideal for local development or small-scale applications. The database stores all journal entries, each with a unique ID, title, content, and timestamps (created and updated).
 
 ## Database Structure:
-- Table: journal_entries
+- SQL Table: journal_entries
+- MongoDB Collection: entries
     - **id** (TEXT) - Primary Key, a unique identifier for each entry.
     - **title** (TEXT) - The title of the journal entry.
     - **content** (TEXT) - The content or body of the journal entry.
@@ -96,6 +110,8 @@ Whenever the application starts, it checks if the journal_entries table exists a
 - [Golang SQLite `database/sql`](https://earthly.dev/blog/golang-sqlite/)
 - [Gorilla Mux](https://github.com/gorilla/mux)
 - [TailwindCSS Documentation](https://tailwindcss.com/docs)
+- [MongoDB Official Documentation](https://www.mongodb.com/docs/)
+- [MongoDB Go Driver Documentation](https://www.mongodb.com/docs/drivers/go/current/quick-start/)
 
 # Future Work
 - Implement user authentication and authorization for secure access.

@@ -34,7 +34,8 @@ var funcMap = template.FuncMap{
 
 func main() {
 	//Initialize storage
-	db, err := storage.NewSQLiteStorage("journal.db")
+	//db, err := storage.NewSQLiteStorage("journal.db")
+	db, err := storage.NewMongoDBStorage("journal", "entries")
 	if err != nil {
 		log.Fatal("Failed to initialize storage: ", err)
 	}
@@ -128,8 +129,8 @@ func PostNewEntryHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println(err)
 		return
 	}
-
 	_, err := journalIntance.CreateEntry(title, content)
+	//fmt.Println("ran", entry)
 	if err != nil {
 		http.Error(w, "Failed to create entry", http.StatusInternalServerError)
 	}
@@ -158,7 +159,7 @@ func EntriesHandler(w http.ResponseWriter, r *http.Request) {
 		Entries:       entries,
 		ShowCreateBtn: true,
 	}
-	fmt.Printf("Home handler %+v\n", data)
+	//fmt.Printf("Home handler %+v\n", data)
 	err := templates.ExecuteTemplate(w, "base", data)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
